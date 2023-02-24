@@ -4,6 +4,8 @@ import { NavLink } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, decreseadCart, getTotal, removeFromCart } from "../../features/cartSlice";
 import { useEffect } from "react";
+import { getCep } from "../../service/cep";
+import { useForm } from "react-hook-form";
 
 
 interface ICartItem {
@@ -28,10 +30,13 @@ interface IItem {
 export function DeliveryCard() {
   const cart = useSelector(state => state.cart)
   const dispatch = useDispatch()
+  const {setValue, register} = useForm()
 
   useEffect(()=>{
     dispatch(getTotal())
   },[cart, dispatch])
+
+
 
   const handleRemoveFromCart = (cartItem: ICartItem) => {
     dispatch(removeFromCart(cartItem))
@@ -49,6 +54,18 @@ export function DeliveryCard() {
   const totalWithTax = cart.cartTotalAmount + 3.5
 
   const totalWithTaxFormat = new Intl.NumberFormat('pt-br', { style: 'currency', currency: 'BRL' }).format(totalWithTax);
+
+  const handleCheckCep = async (event) => {
+    const cepFormat = event.target.value.replace(/\D/g, '')
+    console.log(cepFormat.length)
+    if (cepFormat.length === 8) {
+      const cep = await getCep(cepFormat)
+      setValue('rua', cep.data.logradouro)
+      setValue('bairro', cep.data.bairro)
+      setValue('cidade', cep.data.localidade)
+      setValue('UF', cep.data.uf)
+    }
+  }
  
   return(
     <>    
@@ -59,13 +76,13 @@ export function DeliveryCard() {
           <h2> <MapPinLine size={22} color="#C47F17"/> Endereço de Entrega</h2>
           <span>Informe o endereço onde deseja receber seu pedido</span>
           <form action="">
-            <input type="text" name="" id="cep"  placeholder=" CEP"/> <br />
-            <input type="text" name="" id="rua" placeholder=" Rua"/><br />
-            <input type="text" name="" id="numero" placeholder=" Número"/>
-            <input type="text" name="" id="complemento" placeholder=" Complemento"/><br />
-            <input type="text" name="" id="bairro" placeholder=" Bairro"/>
-            <input type="text" name="" id="cidade" placeholder=" Cidade"/>
-            <input type="text" name="" id="uf" placeholder=" UF"/>
+            <input type="text" id="cep" {...register('cep')} placeholder=" CEP" onChange={handleCheckCep}/> <br />
+            <input type="text" id="rua" {...register('rua')} placeholder=" Rua"/><br />
+            <input type="text" id="numero" {...register('numero')} placeholder=" Número"/>
+            <input type="text" id="complemento" {...register('complemento')} placeholder=" Complemento"/><br />
+            <input type="text" id="bairro" {...register('bairro')} placeholder=" Bairro"/>
+            <input type="text" id="cidade" {...register('cidade')} placeholder=" Cidade"/>
+            <input type="text" id="uf" {...register('UF')} placeholder=" UF"/>
           </form>
         </CardDelivery>
         <CardPayment>
