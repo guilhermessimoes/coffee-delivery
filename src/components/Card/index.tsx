@@ -51,7 +51,7 @@ export function Card(){
             <AddCard>
               <Sifrao>R$</Sifrao><Price> {new Intl.NumberFormat("pt-BR", {maximumSignificantDigits: 2 }).format(product.price)}</Price>
               <InputContainer>
-                <Minus color="#8047F8" attributeType="button" style={{ cursor: "pointer" }}>-</Minus>
+                <Minus color="#8047F8" attributeType="button" style={{ cursor: "pointer" }} onClick={() =>  handleDecreasedFromCart(product)}>-</Minus>
                   <span>{cart.cartTotalQuantity}</span>
                 <Plus color="#8047F8"  style={{ cursor: "pointer" }} onClick={() =>  handleAddToCart(product)}>+</Plus>
               </InputContainer>
