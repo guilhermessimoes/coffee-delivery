@@ -196,6 +196,38 @@ export const Detail = styled.div`
     margin-top: 0.5rem;
   }
 `
+export const InputContainerRemove = styled.button`
+  background-color: ${props => props.theme["base-button"]};
+  border-radius: 6px;
+  width: 91px;
+  height: 32px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border: none;
+  cursor: pointer;
 
+  span {
+    color: ${props => props.theme["base-text"]};
+    font-size: 12px;
+  }
+`
+
+export const InputContainerAdd = styled.div`
+  background-color: ${props => props.theme["base-button"]};
+  border-radius: 8px;
+  width: 72px;
+  height: 32px;
+  display: flex;
+  justify-content: space-around;
+  margin-left: 70px;
+  align-items: center;
+
+  span {
+    color: ${props => props.theme["base-title"]};
+    font-size: 16px;
+    cursor: none;
+  }
+`
 
 
