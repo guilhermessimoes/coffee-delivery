@@ -6,6 +6,8 @@ import { addToCart, decreseadCart, getTotal, removeFromCart } from "../../featur
 import { useEffect } from "react";
 import { getCep } from "../../service/cep";
 import { useForm } from "react-hook-form";
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from "yup";
 
 
 interface ICartItem {
@@ -27,10 +29,16 @@ interface IItem {
     cartTotalQuantity: number
 }
 
+const schema = yup.object({
+  cep: yup.string().required().min(8).max(8),
+}).required();
+
 export function DeliveryCard() {
   const cart = useSelector(state => state.cart)
   const dispatch = useDispatch()
-  const {setValue, register} = useForm()
+  const {setValue, register, formState:{ errors }} = useForm({
+    resolver: yupResolver(schema)
+  })
 
   useEffect(()=>{
     dispatch(getTotal())
@@ -57,7 +65,6 @@ export function DeliveryCard() {
 
   const handleCheckCep = async (event) => {
     const cepFormat = event.target.value.replace(/\D/g, '')
-    console.log(cepFormat.length)
     if (cepFormat.length === 8) {
       const cep = await getCep(cepFormat)
       setValue('rua', cep.data.logradouro)
@@ -76,7 +83,7 @@ export function DeliveryCard() {
           <h2> <MapPinLine size={22} color="#C47F17"/> Endereço de Entrega</h2>
           <span>Informe o endereço onde deseja receber seu pedido</span>
           <form action="">
-            <input type="text" id="cep" {...register('cep')} placeholder=" CEP" onChange={handleCheckCep}/> <br />
+            <input type="text" id="cep" maxLength={8} {...register('cep', { required: true, maxLength: 8, minLength: 8 })} placeholder=" CEP" onChange={handleCheckCep}/> <br />
             <input type="text" id="rua" {...register('rua')} placeholder=" Rua"/><br />
             <input type="text" id="numero" {...register('numero')} placeholder=" Número"/>
             <input type="text" id="complemento" {...register('complemento')} placeholder=" Complemento"/><br />
