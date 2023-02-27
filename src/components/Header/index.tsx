@@ -10,7 +10,6 @@ import { getTotal } from "../../features/cartSlice";
 export function Header(){
   const dispatch =  useDispatch()
   const cart = useSelector(state => state.cart)
-  console.log(cart)
     
     useEffect(()=>{
       dispatch(getTotal())

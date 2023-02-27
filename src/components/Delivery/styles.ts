@@ -4,6 +4,11 @@ export const BannerContainer = styled.section`
   display: flex;
   margin: 0 auto;
   justify-content: space-between;
+
+  form{
+    display: flex;
+    gap: 2rem;
+  }
 `
 
 export const Title = styled.span`
@@ -12,23 +17,26 @@ export const Title = styled.span`
 `
 
 export const CardContainer = styled.div`
-  width: 780px;
-  height: 591;
+  height: 591px;
 `
 
 export const CardDelivery = styled.div`
-  width: 780px;
-  height: 372px;
+  min-width: 780px;
+  min-height: 372px;
   background-color: ${props => props.theme["base-card"]};
   padding: 3rem;
   border-radius: 8px;
   
-  form{
-    margin-top: 2rem;
-  }
+
 
   span{
     margin-left: 1.8rem;
+    padding: 0;
+    margin: 0;
+  }
+
+  div{    
+    margin-bottom: 1rem;
   }
 
   input{
@@ -37,8 +45,12 @@ export const CardDelivery = styled.div`
     color: ${props => props.theme["base-label"]};
     border-color: ${props => props.theme["base-button"]};
     border-radius: 4px;   
-    margin-bottom: 1rem;
     border-style: solid;
+  }
+
+  p{
+    color: red;
+    font-size: 12px;
   }
 
   #cep {
@@ -105,20 +117,6 @@ export const ButtonContainer = styled.div`
   margin-bottom: 2rem;
 
 `
-
-export const ButtonLayout = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 178px;
-  height: 51px;
-  background-color: ${props => props.theme["base-button"]};
-  border: none;
-  border-radius: 4px;
-  font-size: 12px;
-  color: ${props => props.theme["base-text"]};
-`
-
 export const SelectCoffeContainer = styled.section`
   margin: 0 auto;
 `
@@ -148,6 +146,7 @@ export const Product = styled.div`
 
   
 `
+
 export const TotalDetail = styled.span`
   color: ${props => props.theme["base-text"]} !important;
 `
@@ -196,6 +195,7 @@ export const Detail = styled.div`
     margin-top: 0.5rem;
   }
 `
+
 export const InputContainerRemove = styled.button`
   background-color: ${props => props.theme["base-button"]};
   border-radius: 6px;
@@ -230,4 +230,50 @@ export const InputContainerAdd = styled.div`
   }
 `
 
+export const ButtonLayout = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 178px;
+  height: 51px;
+  background-color: ${props => props.theme["base-button"]};
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  color: ${props => props.theme["base-text"]};
+  cursor: pointer;
+`
 
+export const Label = styled.label`
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+`;
+
+export const Input = styled.input`
+  display: none;
+  &:checked + ${ButtonLayout} {
+      &::after {
+        color: ${props => props.theme["purple-dark"]};
+        background-color: ${props => props.theme["purple-light"]};
+      }
+  }
+`;
+
+export const ButtonLayoutConfirmed = styled.button`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 178px;
+  height: 51px;
+  background-color: ${props => props.theme["purple-light"]};
+  border: 1px solid  ${props => props.theme["purple-dark"]};
+  border-radius: 4px;
+  font-size: 12px;
+  color: ${props => props.theme["base-text"]};
+  cursor: pointer;
+`
+
+export const Trees = styled.div`
+  display: flex;
+`

@@ -1,11 +1,11 @@
-import { BannerContainer, CardDelivery, SelectCoffe, CardPayment, CardContainer, Title, SelectCoffeContainer, ButtonLayout, ButtonContainer, Product, Resum, ButtonConfirm, Detail, TotalDetail, InputContainerRemove, InputContainerAdd } from "./styles";
-import { Bank, CreditCard, CurrencyDollar, MapPin, MapPinLine, Minus, Money, Plus, Trash } from "phosphor-react";
-import { NavLink } from "react-router-dom";
+import { BannerContainer, CardDelivery, SelectCoffe, CardPayment, CardContainer, Title, SelectCoffeContainer, ButtonLayout, ButtonContainer, Product, Resum, ButtonConfirm, Detail, TotalDetail, InputContainerRemove, InputContainerAdd, Input, Label, ButtonLayoutConfirmed, Trees } from "./styles";
+import { Bank, CreditCard, CurrencyDollar, MapPin, MapPinLine, Minus, Money, Plus, RadioButton, Trash } from "phosphor-react";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart, decreseadCart, getTotal, removeFromCart } from "../../features/cartSlice";
-import { useEffect } from "react";
+import { addToCart, decreseadCart, getTotal, removeFromCart, setEnderecoCart, setNamePayment } from "../../features/cartSlice";
+import { useEffect, useState } from "react";
 import { getCep } from "../../service/cep";
 import { useForm } from "react-hook-form";
+import { useNavigate } from 'react-router-dom'
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
 
@@ -29,22 +29,54 @@ interface IItem {
     cartTotalQuantity: number
 }
 
+interface IFormInput {
+  cep: string,
+  rua: string,
+  numero: string,
+  complemento: string,
+  bairro: string,
+  cidade: string,
+  uf: string
+}
+
 const schema = yup.object({
-  cep: yup.string().required().min(8).max(8),
+  cep: yup.string().required("O cep é obrigatório").min(8).max(8),
+  rua: yup.string().required("A rua é obrigatório"),
+  numero: yup.string().required("O numero é obrigatório."),
+  complemento: yup.string(),
+  bairro: yup.string().required("O bairro é obrigatório."),
+  cidade: yup.string().required("A cidade é obrigatório."),
+  uf: yup.string().required("UF é obrigatório."),
 }).required();
 
 export function DeliveryCard() {
   const cart = useSelector(state => state.cart)
   const dispatch = useDispatch()
-  const {setValue, register, formState:{ errors }} = useForm({
+  const { setValue, register, handleSubmit, formState:{ errors }} = useForm({
     resolver: yupResolver(schema)
-  })
-
+  })  
+  const [checkDinheiro, setIsDinheiro] = useState(false)
+  const [checkDebito, setIsDebito] = useState(false)
+  const [checkCredito, setIsCredito] = useState(false)
+  const navigate = useNavigate();
+  
+ 
   useEffect(()=>{
     dispatch(getTotal())
   },[cart, dispatch])
 
+  useEffect(() => {
+    if (checkCredito === true) {
+      dispatch(setNamePayment('Cartão de Credito'))
+    }else if(checkDebito === true){
+      dispatch(setNamePayment('Cartão de Debito'))
+    }else if(checkDinheiro === true){
+      dispatch(setNamePayment('Dinheiro'))
+    }
 
+  }, [checkDinheiro, checkDebito, checkCredito])
+
+  
 
   const handleRemoveFromCart = (cartItem: ICartItem) => {
     dispatch(removeFromCart(cartItem))
@@ -55,13 +87,13 @@ export function DeliveryCard() {
   }
 
   const handleIncreasedFromCart = (cartItem: ICartItem) => {
-    console.log("🚀 ~ file: index.tsx:30 ~ handleIncreasedFromCart ~ cartItem:", cartItem)
     dispatch(addToCart(cartItem))
   }
 
   const totalWithTax = cart.cartTotalAmount + 3.5
 
   const totalWithTaxFormat = new Intl.NumberFormat('pt-br', { style: 'currency', currency: 'BRL' }).format(totalWithTax);
+
 
   const handleCheckCep = async (event) => {
     const cepFormat = event.target.value.replace(/\D/g, '')
@@ -70,35 +102,111 @@ export function DeliveryCard() {
       setValue('rua', cep.data.logradouro)
       setValue('bairro', cep.data.bairro)
       setValue('cidade', cep.data.localidade)
-      setValue('UF', cep.data.uf)
-    }
+      setValue('uf', cep.data.uf)      
+    }    
+  }
+
+  const handleChangeDinheiro = () =>{
+    setIsDinheiro(true)
+    setIsDebito(false)
+    setIsCredito(false)
+  }
+  const handleChangeDebito = () =>{
+    setIsDinheiro(false)
+    setIsDebito(true)
+    setIsCredito(false)
+  }
+  const handleChangeCredito = () =>{
+    setIsDinheiro(false)
+    setIsDebito(false)
+    setIsCredito(true)
+  }
+
+  const handleCreateNewCart = (data: any) => {
+    dispatch(setEnderecoCart(data))
+    navigate("/delivery/confirm");
   }
  
   return(
     <>    
     <BannerContainer>
+    <form onSubmit={handleSubmit(handleCreateNewCart)}>
       <CardContainer>
         <Title>Complete seu pedido</Title>
         <CardDelivery>
           <h2> <MapPinLine size={22} color="#C47F17"/> Endereço de Entrega</h2>
-          <span>Informe o endereço onde deseja receber seu pedido</span>
-          <form action="">
-            <input type="text" id="cep" maxLength={8} {...register('cep', { required: true, maxLength: 8, minLength: 8 })} placeholder=" CEP" onChange={handleCheckCep}/> <br />
-            <input type="text" id="rua" {...register('rua')} placeholder=" Rua"/><br />
-            <input type="text" id="numero" {...register('numero')} placeholder=" Número"/>
-            <input type="text" id="complemento" {...register('complemento')} placeholder=" Complemento"/><br />
-            <input type="text" id="bairro" {...register('bairro')} placeholder=" Bairro"/>
-            <input type="text" id="cidade" {...register('cidade')} placeholder=" Cidade"/>
-            <input type="text" id="uf" {...register('UF')} placeholder=" UF"/>
-          </form>
+          <span>Informe o endereço onde deseja receber seu pedido</span><br/><br/>
+            <div>
+              <input type="text" id="cep" {...register('cep', { required: true, maxLength: 8, minLength: 8 })} placeholder=" CEP" onChange={handleCheckCep}/>
+              <p className="error-message">{errors.cep?.message}</p>
+            </div>
+            <div>
+              <input type="text" id="rua" {...register('rua', { required: true, minLength: 2})} placeholder=" Rua"/>
+              <p className="error-message">{errors.rua?.message}</p>
+            </div>
+            <Trees>
+              <div>
+                <input type="text" id="numero" {...register('numero', {required: true, minLength: 2})} placeholder=" Número"/>
+                <p className="error-message">{errors.numero?.message}</p>
+              </div>
+              <div>
+                <input type="text" id="complemento" {...register('complemento')} placeholder=" Complemento"/>
+                <p className="error-message">{errors.complemento?.message}</p>
+              </div>
+            </Trees>
+            <Trees>
+              <div>
+                <input type="text" id="bairro" {...register('bairro', {required: true, minLength: 2})} placeholder=" Bairro"/>
+                <p className="error-message">{errors.bairro?.message}</p>
+              </div>
+              <div>
+                <input type="text" id="cidade" {...register('cidade', {required: true, minLength: 2})} placeholder=" Cidade"/>
+                <p className="error-message">{errors.cidade?.message}</p>
+              </div>
+              <div>
+                <input type="text" id="uf" {...register('uf', {required: true, minLength: 2})} placeholder=" UF"/>
+                <p className="error-message">{errors.uf?.message}</p>
+              </div>
+            </Trees>
+            
         </CardDelivery>
         <CardPayment>
           <span id="payment"><CurrencyDollar size={22} color="#8047F8"/> Pagamento</span><br />
           <span id="textPayment">O pagamento é feito na entrega. Escolha a forma que deseja pagar</span><br />
           <ButtonContainer>
-            <ButtonLayout><CreditCard size={22} color="#8047F8"/> CARTÃO DE CREDITO</ButtonLayout>
-            <ButtonLayout><Bank size={22} color="#8047F8"/> CARTÃO DE DÉBITO</ButtonLayout>
-            <ButtonLayout><Money size={22} color="#8047F8"/> DINHEIRO</ButtonLayout>
+            {checkCredito ? 
+              <ButtonLayoutConfirmed id="london" onClick={() => handleChangeCredito()} >  
+                <CreditCard size={22} color="#8047F8" /> CARTÃO DE CREDITO
+              </ButtonLayoutConfirmed>
+              : 
+              <ButtonLayout id="london" onClick={() => handleChangeCredito()} >              
+                <CreditCard size={22} color="#8047F8"/> CARTÃO DE CREDITO
+              </ButtonLayout>
+              }
+
+              {checkDebito ? 
+              <ButtonLayoutConfirmed id="london" onClick={() => handleChangeCredito()} >  
+                <CreditCard size={22} color="#8047F8"/> CARTÃO DE DEBITO
+              </ButtonLayoutConfirmed>
+              : 
+              <ButtonLayout id="london" onClick={() => handleChangeDebito()} >              
+                <CreditCard size={22} color="#8047F8"/> CARTÃO DE DEBITO
+              </ButtonLayout>
+              }
+
+              {checkDinheiro ? 
+              <ButtonLayoutConfirmed id="london" onClick={() => handleChangeCredito()} >  
+                <Money size={22} color="#8047F8"/> DINHEIRO 
+              </ButtonLayoutConfirmed>
+              : 
+              <ButtonLayout id="london" onClick={() => handleChangeDinheiro()} >              
+                <Money size={22} color="#8047F8"/> DINHEIRO 
+              </ButtonLayout>
+              }
+              <div className="text-danger mt-3">
+                {errors.payment?.type === 'required' &&
+                  'Tell us what is your favourite food.'}
+              </div>
           </ButtonContainer>
         </CardPayment>
       </CardContainer>
@@ -142,13 +250,11 @@ export function DeliveryCard() {
               <span>{totalWithTaxFormat}</span>
             </div>
           </Resum>
-          <NavLink to="/delivery/confirm" title="Histórico">
-            <ButtonConfirm>CONFIRMAR PEDIDO</ButtonConfirm>
-          </NavLink>
+          <ButtonConfirm type="submit">CONFIRMAR PEDIDO</ButtonConfirm>
         </SelectCoffe>
-        : <p>Nenhum item selecionado.</p>}
-        
+        : <p>Nenhum item selecionado.</p>}        
       </SelectCoffeContainer>
+    </form>
     </BannerContainer>
     </>
   )

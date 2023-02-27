@@ -1,8 +1,12 @@
 import { BannerContainer, CardConfirm, IconButtonDollar, IconButtonMap, IconButtonTimer, SubTitleResum, TextContainer, TitleResum } from "./styles";
 import Illustration from '../../assets/Illustration.svg';
 import { CurrencyDollar, IconContext, MapPin, Timer } from "phosphor-react";
+import { useSelector } from "react-redux";
 
-export function ConfirmCard() {
+export function ConfirmCard() {  
+  const cartPayment = useSelector(state => state.cart.cartPayment)
+  const cartEndereco = useSelector(state => state.cart.enderecoCart)
+  
   return(
     <>
     <TitleResum>Uhu! Pedido confirmado</TitleResum>
@@ -15,7 +19,7 @@ export function ConfirmCard() {
               <MapPin size={18} color="white" weight="fill"/>
             </IconButtonMap>
             <div id="sectionResum">
-              <span>  Entrega em Rua João Daniel Martinelli, 102 Farrapos - Porto Alegre, RS</span>            
+              <span>  {`Entrega em ${cartEndereco.rua}, ${cartEndereco.numero} ${cartEndereco.bairro} - ${cartEndereco.cidade}, ${cartEndereco.uf}`}</span>            
             </div>
           </div>          
           <div>
@@ -33,7 +37,7 @@ export function ConfirmCard() {
             </IconButtonDollar>
             <div id="sectionResum">
               <span>Pagamento na entrega</span>
-              <span>Cartão de Credito</span>
+              <span>{cartPayment}</span>
             </div>
           </div>
         </TextContainer>
