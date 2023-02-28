@@ -1,5 +1,5 @@
-import { BannerContainer, CardDelivery, SelectCoffe, CardPayment, CardContainer, Title, SelectCoffeContainer, ButtonLayout, ButtonContainer, Product, Resum, ButtonConfirm, Detail, TotalDetail, InputContainerRemove, InputContainerAdd, Input, Label, ButtonLayoutConfirmed, Trees } from "./styles";
-import { Bank, CreditCard, CurrencyDollar, MapPin, MapPinLine, Minus, Money, Plus, RadioButton, Trash } from "phosphor-react";
+import { BannerContainer, CardDelivery, SelectCoffe, CardPayment, CardContainer, Title, SelectCoffeContainer, ButtonLayout, ButtonContainer, Product, Resum, ButtonConfirm, Detail, TotalDetail, InputContainerRemove, InputContainerAdd, Input, Label, ButtonLayoutConfirmed, Trees, TransactionType, CartTypeButton } from "./styles";
+import { ArrowCircleDown, ArrowCircleUp, Bank, CreditCard, CurrencyDollar, MapPin, MapPinLine, Minus, Money, Plus, RadioButton, Trash } from "phosphor-react";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart, decreseadCart, getTotal, removeFromCart, setEnderecoCart, setNamePayment } from "../../features/cartSlice";
 import { useEffect, useState } from "react";
@@ -172,42 +172,22 @@ export function DeliveryCard() {
         </CardDelivery>
         <CardPayment>
           <span id="payment"><CurrencyDollar size={22} color="#8047F8"/> Pagamento</span><br />
-          <span id="textPayment">O pagamento é feito na entrega. Escolha a forma que deseja pagar</span><br />
-          <ButtonContainer>
-            {checkCredito ? 
-              <ButtonLayoutConfirmed id="london" onClick={() => handleChangeCredito()} >  
-                <CreditCard size={22} color="#8047F8" /> CARTÃO DE CREDITO
-              </ButtonLayoutConfirmed>
-              : 
-              <ButtonLayout id="london" onClick={() => handleChangeCredito()} >              
-                <CreditCard size={22} color="#8047F8"/> CARTÃO DE CREDITO
-              </ButtonLayout>
-              }
+          <span id="textPayment">O pagamento é feito na entrega. Escolha a forma que deseja pagar</span><br />   
 
-              {checkDebito ? 
-              <ButtonLayoutConfirmed id="london" onClick={() => handleChangeCredito()} >  
-                <CreditCard size={22} color="#8047F8"/> CARTÃO DE DEBITO
-              </ButtonLayoutConfirmed>
-              : 
-              <ButtonLayout id="london" onClick={() => handleChangeDebito()} >              
-                <CreditCard size={22} color="#8047F8"/> CARTÃO DE DEBITO
-              </ButtonLayout>
-              }
-
-              {checkDinheiro ? 
-              <ButtonLayoutConfirmed id="london" onClick={() => handleChangeCredito()} >  
-                <Money size={22} color="#8047F8"/> DINHEIRO 
-              </ButtonLayoutConfirmed>
-              : 
-              <ButtonLayout id="london" onClick={() => handleChangeDinheiro()} >              
-                <Money size={22} color="#8047F8"/> DINHEIRO 
-              </ButtonLayout>
-              }
-              <div className="text-danger mt-3">
-                {errors.payment?.type === 'required' &&
-                  'Tell us what is your favourite food.'}
-              </div>
-          </ButtonContainer>
+          <TransactionType>
+            <CartTypeButton variant="credito" value="credito">
+              <CreditCard size={22} color="#8047F8"/>
+              Cartão de Credito
+            </CartTypeButton>
+            <CartTypeButton variant="debito" value="debito">
+              <CreditCard size={22} color="#8047F8"/>
+              Cartão de Debito
+            </CartTypeButton>
+            <CartTypeButton variant="dinheiro" value="dinheiro">
+              <Money size={22} color="#8047F8"/>
+              Dinheiro
+            </CartTypeButton>
+          </TransactionType>
         </CardPayment>
       </CardContainer>
       <SelectCoffeContainer>

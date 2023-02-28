@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import * as RadioGroup from '@radix-ui/react-radio-group';
 
 export const BannerContainer = styled.section`
   display: flex;
@@ -277,3 +278,40 @@ export const ButtonLayoutConfirmed = styled.button`
 export const Trees = styled.div`
   display: flex;
 `
+export const TransactionType = styled(RadioGroup.Root)`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+`;
+
+interface CartTypeButtonProps {
+  variant: 'credito' | 'debito' | 'dinheiro';
+}
+
+export const CartTypeButton = styled(RadioGroup.Item)<CartTypeButtonProps>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 178px;
+  height: 51px;
+  background-color: ${props => props.theme["base-button"]};
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  color: ${props => props.theme["base-text"]};
+  cursor: pointer;
+  svg {
+    margin-right: 10px;
+  }
+
+  &[data-state='unchecked']:hover {
+    transition: background-color 0.2s;
+    background: ${props => props.theme["base-hover"]};
+  }
+  &[data-state='checked'] {
+    background-color: ${props => props.theme["purple-light"]};
+    border: 1px solid  ${props => props.theme["purple-dark"]};
+  }
+`;    
+
