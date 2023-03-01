@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { addToCart, decreseadCart, getTotal, removeFromCart, setEnderecoCart, setNamePayment } from "../../features/cartSlice";
 import { useEffect, useState } from "react";
 import { getCep } from "../../service/cep";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { useNavigate } from 'react-router-dom'
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from "yup";
@@ -47,36 +47,24 @@ const schema = yup.object({
   bairro: yup.string().required("O bairro é obrigatório."),
   cidade: yup.string().required("A cidade é obrigatório."),
   uf: yup.string().required("UF é obrigatório."),
+  type: yup.string().oneOf(Object.values(['Cartão de crédito', 'Cartão de débito', 'dinheiro'])),
 }).required();
 
 export function DeliveryCard() {
   const cart = useSelector(state => state.cart)
   const dispatch = useDispatch()
-  const { setValue, register, handleSubmit, formState:{ errors }} = useForm({
-    resolver: yupResolver(schema)
-  })  
-  const [checkDinheiro, setIsDinheiro] = useState(false)
-  const [checkDebito, setIsDebito] = useState(false)
-  const [checkCredito, setIsCredito] = useState(false)
+  const { setValue, register, handleSubmit,control, formState:{ errors }} = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      type: 'Cartão de crédito'
+    }
+  }) 
   const navigate = useNavigate();
   
  
   useEffect(()=>{
     dispatch(getTotal())
-  },[cart, dispatch])
-
-  useEffect(() => {
-    if (checkCredito === true) {
-      dispatch(setNamePayment('Cartão de Credito'))
-    }else if(checkDebito === true){
-      dispatch(setNamePayment('Cartão de Debito'))
-    }else if(checkDinheiro === true){
-      dispatch(setNamePayment('Dinheiro'))
-    }
-
-  }, [checkDinheiro, checkDebito, checkCredito])
-
-  
+  },[cart, dispatch])  
 
   const handleRemoveFromCart = (cartItem: ICartItem) => {
     dispatch(removeFromCart(cartItem))
@@ -104,22 +92,6 @@ export function DeliveryCard() {
       setValue('cidade', cep.data.localidade)
       setValue('uf', cep.data.uf)      
     }    
-  }
-
-  const handleChangeDinheiro = () =>{
-    setIsDinheiro(true)
-    setIsDebito(false)
-    setIsCredito(false)
-  }
-  const handleChangeDebito = () =>{
-    setIsDinheiro(false)
-    setIsDebito(true)
-    setIsCredito(false)
-  }
-  const handleChangeCredito = () =>{
-    setIsDinheiro(false)
-    setIsDebito(false)
-    setIsCredito(true)
   }
 
   const handleCreateNewCart = (data: any) => {
@@ -174,20 +146,24 @@ export function DeliveryCard() {
           <span id="payment"><CurrencyDollar size={22} color="#8047F8"/> Pagamento</span><br />
           <span id="textPayment">O pagamento é feito na entrega. Escolha a forma que deseja pagar</span><br />   
 
-          <TransactionType>
-            <CartTypeButton variant="credito" value="credito">
-              <CreditCard size={22} color="#8047F8"/>
-              Cartão de Credito
-            </CartTypeButton>
-            <CartTypeButton variant="debito" value="debito">
-              <CreditCard size={22} color="#8047F8"/>
-              Cartão de Debito
-            </CartTypeButton>
-            <CartTypeButton variant="dinheiro" value="dinheiro">
-              <Money size={22} color="#8047F8"/>
-              Dinheiro
-            </CartTypeButton>
-          </TransactionType>
+          <Controller control={control} name="type" render={({ field }, ) =>{
+            return(
+              <TransactionType onValueChange={field.onChange} value={field.value}>
+                <CartTypeButton variant="credito" value="Cartão de crédito" {...register('type', {required: true})}>
+                  <CreditCard size={22} color="#8047F8"/>
+                  Cartão de Credito
+                </CartTypeButton>
+                <CartTypeButton variant="debito" value="Cartão de débito" {...register('type', {required: true})}>
+                  <CreditCard size={22} color="#8047F8"/>
+                  Cartão de Debito
+                </CartTypeButton>
+                <CartTypeButton variant="dinheiro" value="dinheiro" {...register('type', {required: true})}>
+                  <Money size={22} color="#8047F8"/>
+                  Dinheiro
+                </CartTypeButton>
+              </TransactionType>
+            )
+          }} />
         </CardPayment>
       </CardContainer>
       <SelectCoffeContainer>

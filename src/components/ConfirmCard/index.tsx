@@ -3,8 +3,7 @@ import Illustration from '../../assets/Illustration.svg';
 import { CurrencyDollar, IconContext, MapPin, Timer } from "phosphor-react";
 import { useSelector } from "react-redux";
 
-export function ConfirmCard() {  
-  const cartPayment = useSelector(state => state.cart.cartPayment)
+export function ConfirmCard() {
   const cartEndereco = useSelector(state => state.cart.enderecoCart)
   
   return(
@@ -37,7 +36,7 @@ export function ConfirmCard() {
             </IconButtonDollar>
             <div id="sectionResum">
               <span>Pagamento na entrega</span>
-              <span>{cartPayment}</span>
+              <span>{cartEndereco.type}</span>
             </div>
           </div>
         </TextContainer>
